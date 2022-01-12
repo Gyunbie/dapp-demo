@@ -1,22 +1,12 @@
 import BlueButton from "./BlueButton";
-import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 
 function BuyTokenPage() {
-  const [account, setAccount] = useState("");
-  localStorage.setItem("redirected", true);
-
-  useEffect(() => {
-    if (localStorage.getItem("account")) {
-      setAccount(localStorage.getItem("account"));
-    }
-  }, [])
+  const { wallet_id } = useParams();
 
   return (
     <div className="flex flex-col justify-center items-center h-[100vh]">
-      <p className="text-2xl mb-3">
-        Wallet Address: {account}
-      </p>
+      <p className="text-2xl mb-3">Wallet Address: {wallet_id}</p>
       <div className="flex">
         <BlueButton text="Refill Balance" />
         <p className="mx-5"></p>

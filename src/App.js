@@ -20,8 +20,14 @@ function App() {
   }
 
   useEffect(() => {
-    localStorage.setItem("account", web3react.account);
-  }, [web3react.account]);
+    if (typeof window.ethereum === "undefined") {
+      navigate("/no-metamask");
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    localStorage.setItem("redirected", false);
+  }, [web3react?.account]);
 
   useEffect(() => {
     web3react.library?.eth
@@ -44,10 +50,11 @@ function App() {
   useEffect(() => {
     if (
       balance < 1 &&
-      (!localStorage.getItem("redirected") ||
-        localStorage.getItem("redirected") === undefined)
+      (!sessionStorage.getItem("redirected") ||
+        sessionStorage.getItem("redirected") === undefined)
     ) {
       navigate(`/${web3react.account}`);
+      sessionStorage.setItem("redirected", true);
     }
   }, [balance, navigate, web3react.account]);
 
@@ -64,15 +71,16 @@ function App() {
             <p className="text-2xl">Wallet Address: {web3react.account}</p>
             <p className="text-2xl">Balance: {balance} ETH</p>
 
-            <div className="my-3 flex flex-col items-center border-2 border-gray-300 rounded-lg">
+            <div className="mt-10 mb-3 flex flex-col items-center border-2 border-gray-300 rounded-lg">
+              <h1 className="mt-2 mb-3 text-xl font-bold">Sign Message</h1>
               <input
-                className="p-2 outline-none ring-2 ring-gray-300 focus:ring-black duration-150 ease-out rounded my-2 w-1/2"
+                className="p-2 outline-none ring-2 ring-gray-300 focus:ring-black duration-150 ease-out rounded my-2 w-3/4"
                 onChange={(e) => setProfileName(e.target.value)}
                 type="text"
                 placeholder="Enter your profile name"
               />
               <input
-                className="p-2 outline-none ring-2 ring-gray-300 rounded my-2 w-1/2"
+                className="p-2 outline-none ring-2 ring-gray-300 rounded my-2 w-3/4"
                 type="text"
                 placeholder={web3react.account}
                 disabled
