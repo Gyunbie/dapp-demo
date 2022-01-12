@@ -53,7 +53,7 @@ function App() {
       (!sessionStorage.getItem("redirected") ||
         sessionStorage.getItem("redirected") === undefined)
     ) {
-      navigate(`/${web3react.account}`);
+      navigate(`/wallets/${web3react.account}`);
       sessionStorage.setItem("redirected", true);
     }
   }, [balance, navigate, web3react.account]);
