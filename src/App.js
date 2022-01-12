@@ -1,6 +1,6 @@
 import { useWeb3React } from "@web3-react/core";
 import { InjectedConnector } from "@web3-react/injected-connector";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import BlueButton from "./BlueButton";
 import { useNavigate } from "react-router-dom";
 
@@ -9,20 +9,15 @@ function App() {
   const navigate = useNavigate();
   const [balance, setBalance] = useState();
   const injected = new InjectedConnector({ supportedChainIds: [1, 3, 4, 28] });
+  const [profileName, setProfileName] = useState("");
 
-  const connect = useCallback(async () => {
+  async function connect() {
     try {
       await web3react.activate(injected);
     } catch (error) {
       console.log(error);
     }
-  }, [web3react, injected]);
-
-  useEffect(() => {
-    const logged_in = localStorage.getItem("account");
-
-    if (logged_in) connect();
-  }, [connect]);
+  }
 
   useEffect(() => {
     localStorage.setItem("account", web3react.account);
@@ -37,10 +32,22 @@ function App() {
       .catch((error) => console.log(error));
   }, [web3react.account, web3react.library?.eth]);
 
+  function signMessage(message) {
+    web3react.library?.eth.personal
+      .sign(message, web3react.account)
+      .then((response) => {
+        return response;
+      })
+      .catch((err) => console.log(err));
+  }
+
   useEffect(() => {
-    if (balance < 1 && !localStorage.getItem("redirected")) {
+    if (
+      balance < 1 &&
+      (!localStorage.getItem("redirected") ||
+        localStorage.getItem("redirected") === undefined)
+    ) {
       navigate(`/${web3react.account}`);
-      localStorage.setItem("redirected", true);
     }
   }, [balance, navigate, web3react.account]);
 
@@ -56,11 +63,32 @@ function App() {
           <div>
             <p className="text-2xl">Wallet Address: {web3react.account}</p>
             <p className="text-2xl">Balance: {balance} ETH</p>
+
+            <div className="my-3 flex flex-col items-center border-2 border-gray-300 rounded-lg">
+              <input
+                className="p-2 outline-none ring-2 ring-gray-300 focus:ring-black duration-150 ease-out rounded my-2 w-1/2"
+                onChange={(e) => setProfileName(e.target.value)}
+                type="text"
+                placeholder="Enter your profile name"
+              />
+              <input
+                className="p-2 outline-none ring-2 ring-gray-300 rounded my-2 w-1/2"
+                type="text"
+                placeholder={web3react.account}
+                disabled
+              />
+              <BlueButton
+                text={"Sign Message"}
+                click_func={() => signMessage(profileName)}
+              />
+            </div>
           </div>
         ) : (
           <BlueButton text="Connect with Metamask" click_func={connect} />
         )}
       </div>
+
+      {}
     </div>
   );
 }
