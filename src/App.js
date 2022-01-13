@@ -34,6 +34,7 @@ function App() {
       .getBalance(web3react.account)
       .then((balance) => {
         setBalance(balance / 1e18);
+        localStorage.setItem("balance", balance);
       })
       .catch((error) => console.log(error));
   }, [web3react.account, web3react.library?.eth]);
